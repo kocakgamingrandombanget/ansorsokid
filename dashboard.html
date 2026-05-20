@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - GP Ansor Sowan Kidul</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Quill Editor CSS untuk Rich Text -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ansor: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #f9fafb; }
+        
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Menyamakan gaya CSS dengan index.html */
+        .card-minimal {
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+        }
+        
+        .card-minimal:hover {
+            border-color: #16a34a;
+            box-shadow: 0 10px 20px -5px rgba(21, 128, 61, 0.08), 0 4px 6px -2px rgba(21, 128, 61, 0.04);
+            transform: translateY(-2px);
+        }
+
+        .btn-clean {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
+            color: white;
+            border: 1px solid transparent;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #166534 0%, #15803d 100%);
+            box-shadow: 0 4px 12px -2px rgba(21, 128, 61, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #15803d;
+            border: 1px solid #15803d;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-outline::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-outline:hover::before {
+            opacity: 1;
+        }
+
+        .btn-outline:hover {
+            border-color: #16a34a;
+            transform: translateY(-1px);
+        }
+
+        /* Latar Belakang Animasi (Sama dengan Index) */
+        .pattern-dots {
+            background-image: radial-gradient(#22c55e 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
+
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+
+        .animate-blob {
+            animation: blob 12s infinite alternate ease-in-out;
+        }
+
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+
+        /* Penyesuaian Style Quill Editor agar serasi dengan Tailwind */
+        .ql-toolbar.ql-snow { border: none !important; border-bottom: 1px solid #e5e7eb !important; background: #f9fafb; font-family: 'Inter', sans-serif; border-radius: 0.5rem 0.5rem 0 0; }
+        .ql-container.ql-snow { border: none !important; font-family: 'Inter', sans-serif; font-size: 0.875rem; }
+        .ql-editor { min-height: 200px; }
+        .ql-editor.ql-blank::before { color: #9ca3af; font-style: normal; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="text-gray-800 antialiased h-screen overflow-hidden flex">
+
+    <!-- LOGIN VIEW BERGAYA SERASI DENGAN HERO INDEX -->
+    <div id="login-view" class="fixed inset-0 bg-white flex items-center justify-center z-50 overflow-hidden">
+        
+        <!-- Elemen Latar Belakang (Interactive & Decorative) -->
+        <div class="absolute inset-0 bg-gradient-to-br from-ansor-50/60 via-white to-gray-50/50 z-0 pointer-events-none"></div>
+        
+        <!-- Animated Blobs -->
+        <div class="absolute top-0 left-0 w-[500px] h-[500px] bg-ansor-100 rounded-full mix-blend-multiply filter blur-[80px] opacity-60 animate-blob z-0 -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+        <div class="absolute bottom-0 right-0 w-[400px] h-[400px] bg-green-50 rounded-full mix-blend-multiply filter blur-[60px] opacity-70 animate-blob animation-delay-2000 z-0 translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
+        
+        <!-- Pola Titik -->
+        <div class="absolute top-24 left-8 w-48 h-48 pattern-dots opacity-20 z-0 pointer-events-none"></div>
+        <div class="absolute bottom-12 right-12 w-64 h-64 pattern-dots opacity-15 z-0 pointer-events-none hidden md:block"></div>
+
+        <!-- Login Card (Glassmorphism) -->
+        <div class="bg-white/80 backdrop-blur-xl border border-white/50 rounded-2xl shadow-2xl p-8 w-full max-w-md relative z-10 mx-4 fade-in">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-ansor-600 to-ansor-800 rounded-2xl flex items-center justify-center text-white mx-auto mb-5 shadow-lg shadow-ansor-700/20 transform hover:scale-105 transition-transform">
+                    <span class="material-icons-round text-3xl">admin_panel_settings</span>
+                </div>
+                <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">Portal Admin</h1>
+                <p class="text-sm text-gray-500 mt-1">PR GP Ansor Sowan Kidul</p>
+            </div>
+            
+            <form id="login-form" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Username</label>
+                    <div class="relative group">
+                        <span class="material-icons-round absolute left-3 top-2.5 text-gray-400 text-sm group-focus-within:text-ansor-600 transition-colors">person</span>
+                        <input type="text" id="username" class="w-full pl-10 pr-4 py-2 bg-white/50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ansor-500 focus:border-ansor-500 outline-none transition-all" placeholder="Masukkan username" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Password</label>
+                    <div class="relative group">
+                        <span class="material-icons-round absolute left-3 top-2.5 text-gray-400 text-sm group-focus-within:text-ansor-600 transition-colors">lock</span>
+                        <input type="password" id="password" class="w-full pl-10 pr-4 py-2 bg-white/50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ansor-500 focus:border-ansor-500 outline-none transition-all" placeholder="••••••••" required>
+                    </div>
+                </div>
+                <button type="submit" class="w-full btn-clean btn-primary mt-4">
+                    Masuk ke Dashboard
+                </button>
+                <div class="text-center mt-4">
+                    <a href="index.html" class="text-sm text-ansor-700 hover:underline font-medium inline-flex items-center">
+                        <span class="material-icons-round text-[16px] mr-1">arrow_back</span> Kembali ke Beranda
+                    </a>
+                </div>
+                <p id="login-error" class="text-red-500 text-xs text-center hidden mt-2 bg-red-50 p-2 rounded border border-red-100">Username atau password salah!</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- DASHBOARD VIEW (Hidden by default) -->
+    <div id="dashboard-view" class="w-full h-full flex hidden">
+        
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white border-r border-gray-200 h-full flex flex-col transition-all duration-300 shadow-sm z-20" id="sidebar">
+            <div class="h-16 flex items-center px-6 bg-gradient-to-r from-ansor-50 to-white border-b border-gray-200">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-ansor-600 to-ansor-800 rounded flex items-center justify-center text-white font-bold text-sm">
+                        GP
+                    </div>
+                    <span class="font-bold text-gray-900 truncate">Admin Sowan Kidul</span>
+                </div>
+            </div>
+            
+            <div class="p-4 flex-1 overflow-y-auto">
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-3">Menu Utama</p>
+                <nav class="space-y-1">
+                    <a href="#" onclick="showSection('list-berita')" class="nav-link active flex items-center px-3 py-2.5 bg-gradient-to-r from-ansor-50 to-transparent text-ansor-700 rounded-lg font-medium group transition-colors border-l-2 border-ansor-600">
+                        <span class="material-icons-round mr-3 text-[20px]">article</span>
+                        Kelola Berita
+                    </a>
+                    <a href="#" onclick="showSection('tambah-berita')" class="nav-link flex items-center px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium group transition-colors border-l-2 border-transparent hover:border-gray-300">
+                        <span class="material-icons-round mr-3 text-[20px]">add_circle</span>
+                        Tulis Berita Baru
+                    </a>
+                </nav>
+
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-3 mt-8">Pengaturan</p>
+                <nav class="space-y-1">
+                    <a href="#" onclick="showSection('profil-admin')" class="nav-link flex items-center px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium group transition-colors border-l-2 border-transparent hover:border-gray-300">
+                        <span class="material-icons-round mr-3 text-[20px]">manage_accounts</span>
+                        Profil Admin
+                    </a>
+                    <a href="#" onclick="showSection('konfigurasi-api')" class="nav-link flex items-center px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium group transition-colors border-l-2 border-transparent hover:border-gray-300">
+                        <span class="material-icons-round mr-3 text-[20px]">api</span>
+                        Konfigurasi API
+                    </a>
+                </nav>
+            </div>
+
+            <div class="p-4 border-t border-gray-200 bg-gray-50">
+                <button onclick="logout()" class="w-full flex items-center justify-center px-3 py-2 text-red-600 hover:bg-red-100 rounded-lg font-medium transition-colors border border-red-200">
+                    <span class="material-icons-round mr-2 text-[20px]">logout</span>
+                    Keluar
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col h-full relative z-10">
+            <!-- Topbar -->
+            <header class="h-16 bg-white/80 backdrop-blur border-b border-gray-200 flex items-center justify-between px-6 shrink-0 shadow-sm z-10">
+                <div class="flex items-center">
+                    <button id="mobile-menu-toggle" class="mr-4 text-gray-500 hover:text-gray-700 md:hidden">
+                        <span class="material-icons-round">menu</span>
+                    </button>
+                    <h2 id="page-title" class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-700">Kelola Berita</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="hidden md:block text-sm text-right">
+                        <p class="font-bold text-gray-900 leading-none">Admin Ranting</p>
+                        <p class="text-xs text-ansor-600 font-medium mt-1">● Online</p>
+                    </div>
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-ansor-100 to-ansor-50 flex items-center justify-center border border-ansor-200 text-ansor-700 font-bold shadow-sm">
+                        A
+                    </div>
+                </div>
+            </header>
+
+            <!-- Scrollable Content -->
+            <div class="flex-1 overflow-y-auto p-6 relative">
+                
+                <!-- Ornamen Latar Tipis -->
+                <div class="absolute top-0 right-0 w-[400px] h-[400px] bg-ansor-50/50 rounded-full mix-blend-multiply filter blur-[80px] pointer-events-none -z-10"></div>
+
+                <!-- SECTION: LIST BERITA -->
+                <div id="section-list-berita" class="fade-in max-w-6xl mx-auto">
+                    <!-- Search & Filter -->
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+                        <div class="relative w-full sm:w-80">
+                            <span class="material-icons-round absolute left-3 top-2.5 text-gray-400 text-sm">search</span>
+                            <input type="text" class="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ansor-500 focus:border-ansor-500 outline-none text-sm shadow-sm" placeholder="Cari judul berita...">
+                        </div>
+                        <button onclick="showSection('tambah-berita')" class="w-full sm:w-auto btn-clean btn-primary text-sm shadow-sm">
+                            <span class="material-icons-round mr-1 text-[18px]">add</span> Tulis Berita
+                        </button>
+                    </div>
+
+                    <!-- Table Data -->
+                    <div class="card-minimal overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm whitespace-nowrap">
+                                <thead class="bg-gray-50 border-b border-gray-200 text-gray-700">
+                                    <tr>
+                                        <th class="px-6 py-4 font-bold">Judul Berita</th>
+                                        <th class="px-6 py-4 font-bold">Kategori</th>
+                                        <th class="px-6 py-4 font-bold">Tanggal Publikasi</th>
+                                        <th class="px-6 py-4 font-bold text-center">Status</th>
+                                        <th class="px-6 py-4 font-bold text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100" id="table-body">
+                                    <!-- Data akan diisi lewat JavaScript dari Google Script -->
+                                    <tr><td colspan="5" class="text-center py-8 text-gray-500"><span class="material-icons-round animate-spin text-2xl mb-2">autorenew</span><br>Memuat data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50/50">
+                            <span class="text-sm text-gray-500 font-medium" id="table-info">Menampilkan data...</span>
+                            <div class="flex gap-2">
+                                <button class="btn-clean border border-gray-300 text-gray-600 hover:bg-gray-100 disabled:opacity-50 py-1.5 px-3 text-xs" disabled>Sebelumnya</button>
+                                <button class="btn-clean border border-gray-300 text-gray-600 hover:bg-gray-100 py-1.5 px-3 text-xs" disabled>Selanjutnya</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: TAMBAH/EDIT BERITA -->
+                <div id="section-tambah-berita" class="hidden fade-in max-w-4xl mx-auto pb-10">
+                    <div class="card-minimal p-6 sm:p-8">
+                        <form id="form-berita" class="space-y-6">
+                            
+                            <!-- Judul -->
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1.5">Judul Berita <span class="text-red-500">*</span></label>
+                                <input type="text" id="berita-judul" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ansor-500 focus:border-ansor-500 outline-none transition-all text-gray-900 bg-gray-50 focus:bg-white" placeholder="Masukkan judul berita yang menarik" required>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Kategori -->
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Kategori <span class="text-red-500">*</span></label>
+                                    <select id="berita-kategori" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ansor-500 focus:border-ansor-500 outline-none transition-all text-gray-900 bg-gray-50 focus:bg-white cursor-pointer" required>
+                                        <option value="" disabled selected>Pilih Kategori</option>
+                                        <option value="Ranting">Berita Ranting</option>
+                                        <option value="Banser">Kegiatan Banser</option>
+                                        <option value="Amaliyah">Amaliyah & Kajian</option>
+                                        <option value="Pengumuman">Pengumuman</option>
+                                    </select>
+                                </div>
+                                <!-- Tanggal -->
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Tanggal Publikasi <span class="text-red-500">*</span></label>
+                                    <input type="date" id="berita-tanggal" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ansor-500 focus:border-ansor-500 outline-none transition-all text-gray-900 bg-gray-50 focus:bg-white cursor-pointer" required>
+                                </div>
+                            </div>
+
+                            <!-- Upload Foto -->
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1.5">Upload Foto Utama <span class="text-gray-400 font-normal text-xs">(Akan disimpan ke Google Drive)</span></label>
+                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:bg-ansor-50 hover:border-ansor-300 transition-colors cursor-pointer group" id="drop-zone" onclick="document.getElementById('berita-foto').click()">
+                                    <div class="space-y-2 text-center">
+                                        <div class="w-12 h-12 bg-gray-100 group-hover:bg-ansor-100 text-gray-400 group-hover:text-ansor-600 rounded-full flex items-center justify-center mx-auto transition-colors">
+                                            <span class="material-icons-round text-2xl">cloud_upload</span>
+                                        </div>
+                                        <div class="flex text-sm text-gray-600 justify-center">
+                                            <label for="berita-foto" class="relative cursor-pointer rounded-md bg-transparent font-bold text-ansor-700 hover:text-ansor-800 focus-within:outline-none">
+                                                <span>Klik untuk upload file</span>
+                                                <input id="berita-foto" name="berita-foto" type="file" class="sr-only" accept="image/*" onchange="previewImage(event)">
+                                            </label>
+                                            <p class="pl-1">atau drag & drop</p>
+                                        </div>
+                                        <p class="text-xs text-gray-500 font-medium">PNG, JPG, GIF max 5MB</p>
+                                    </div>
+                                </div>
+                                <!-- Image Preview -->
+                                <div id="image-preview-container" class="hidden mt-4 relative w-full sm:w-1/2 rounded-xl overflow-hidden border-2 border-gray-200 shadow-sm">
+                                    <img id="image-preview" src="" alt="Preview" class="w-full h-auto object-cover">
+                                    <button type="button" onclick="removeImage()" class="absolute top-2 right-2 bg-red-600/90 backdrop-blur text-white rounded-lg p-1.5 hover:bg-red-700 shadow-md transition-colors">
+                                        <span class="material-icons-round text-[18px]">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Konten -->
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1.5">Isi Berita <span class="text-red-500">*</span></label>
+                                <!-- Kontainer Editor Rich Text -->
+                                <div class="border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-ansor-500 focus-within:border-ansor-500 transition-all bg-white shadow-sm">
+                                    <div id="berita-konten-container" class="bg-white text-gray-900 text-base"></div>
+                                </div>
+                                <!-- Input hidden untuk validasi -->
+                                <input type="hidden" id="berita-konten" required>
+                            </div>
+
+                            <hr class="border-gray-100">
+
+                            <!-- Submit Buttons -->
+                            <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2">
+                                <button type="button" onclick="showSection('list-berita')" class="btn-clean border border-gray-300 text-gray-700 hover:bg-gray-100">Batal</button>
+                                <button type="submit" id="btn-submit" class="btn-clean btn-primary">
+                                    <span class="material-icons-round mr-2 text-[18px]">publish</span> Publish Berita
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- SECTION: PROFIL ADMIN -->
+                <div id="section-profil-admin" class="hidden fade-in max-w-3xl mx-auto pb-10">
+                    <div class="card-minimal p-6 sm:p-8">
+                        <div class="flex items-center gap-4 mb-6 border-b border-gray-100 pb-6">
+                            <div class="w-16 h-16 bg-gradient-to-br from-ansor-600 to-ansor-800 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-md">
+                                A
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900">Profil Administrator</h3>
+                                <p class="text-sm text-gray-500">Perbarui informasi kredensial akun Anda di sini.</p>
+                            </div>
+                        </div>
+
+                        <form id="form-profil" class="space-y-5">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1.5">Username Saat Ini</label>
+                                <input type="text" value="admin" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-gray-500 bg-gray-100 cursor-not-allowed" disabled>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1.5">Password Baru</label>
+                                <input type="password" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ansor-500 focus:border-ansor-500 outline-none transition-all text-gray-900 bg-gray-50 focus:bg-white" placeholder="Masukkan password baru">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1.5">Konfirmasi Password Baru</label>
+                                <input type="password" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ansor-500 focus:border-ansor-500 outline-none transition-all text-gray-900 bg-gray-50 focus:bg-white" placeholder="Ulangi password baru">
+                            </div>
+                            <hr class="border-gray-100 mt-6 mb-4">
+                            <div class="flex justify-end pt-2">
+                                <button type="submit" class="btn-clean btn-primary">
+                                    <span class="material-icons-round mr-2 text-[18px]">save</span> Simpan Perubahan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- SECTION: KONFIGURASI API -->
+                <div id="section-konfigurasi-api" class="hidden fade-in max-w-3xl mx-auto pb-10">
+                    <div class="card-minimal p-6 sm:p-8">
+                        <div class="flex items-center gap-4 mb-6 border-b border-gray-100 pb-6">
+                            <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-800 rounded-2xl flex items-center justify-center text-white shadow-md">
+                                <span class="material-icons-round text-3xl">api</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900">Konfigurasi API Database</h3>
+                                <p class="text-sm text-gray-500">Hubungkan dashboard ini dengan Google Apps Script (Spreadsheet & Drive).</p>
+                            </div>
+                        </div>
+
+                        <form id="form-api" class="space-y-5">
+                            <div class="bg-blue-50 border border-blue-100 text-blue-800 p-4 rounded-lg text-sm flex gap-3">
+                                <span class="material-icons-round text-blue-500 flex-shrink-0">info</span>
+                                <p><strong>Informasi:</strong> URL API ini disimpan di dalam memori browser lokal Anda (Local Storage). Jika Anda berpindah perangkat/browser, Anda harus memasukkan URL ini lagi.</p>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1.5">URL Web App Google Script <span class="text-red-500">*</span></label>
+                                <textarea id="api-url-input" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-gray-900 bg-gray-50 focus:bg-white text-sm font-mono" placeholder="https://script.google.com/macros/s/.../exec" required></textarea>
+                            </div>
+                            
+                            <hr class="border-gray-100 mt-6 mb-4">
+                            <div class="flex justify-end pt-2">
+                                <button type="button" onclick="testConnection()" class="btn-clean border border-gray-300 text-gray-700 hover:bg-gray-100 mr-3">
+                                    <span class="material-icons-round mr-2 text-[18px]">sync_alt</span> Uji Koneksi
+                                </button>
+                                <button type="submit" class="btn-clean bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800 border-none shadow-md">
+                                    <span class="material-icons-round mr-2 text-[18px]">save</span> Simpan API
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Notifikasi Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 z-50 bg-gray-900 text-white px-5 py-4 rounded-xl shadow-2xl flex items-center gap-3 border border-gray-700">
+        <span class="material-icons-round text-green-400" id="toast-icon">check_circle</span>
+        <span id="toast-message" class="text-sm font-bold">Berita berhasil dipublikasikan!</span>
+    </div>
+
+    <!-- Quill Editor JS -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+    <script>
+        // =================================================================
+        // MANAJEMEN API GOOGLE APPS SCRIPT (LOCAL STORAGE)
+        // Default menggunakan API yang sebelumnya diberikan
+        // =================================================================
+        const DEFAULT_API = 'https://script.google.com/macros/s/AKfycbz6RxkWkouYSHenq_HFK6IGtZHJgvIbvFpGQeSMmLhZl1CDTP9IO2Gmj2owyLGM3SHxBA/exec';
+        let SCRIPT_URL = localStorage.getItem('ansor_api_url') || DEFAULT_API; 
+
+        // Set input form Konfigurasi dengan API yang aktif saat ini
+        document.getElementById('api-url-input').value = SCRIPT_URL;
+        // =================================================================
+
+        // --- LOGIC UI & NAVIGASI ---
+        const loginView = document.getElementById('login-view');
+        const dashboardView = document.getElementById('dashboard-view');
+        
+        // Inisialisasi Quill Editor (Rich Text)
+        var quill = new Quill('#berita-konten-container', {
+            theme: 'snow',
+            placeholder: 'Ketik isi berita secara lengkap dengan format (paragraf, poin list, tebal, dll) di sini...',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link', 'blockquote'],
+                    ['clean']
+                ]
+            }
+        });
+
+        // Sinkronisasi isi Quill ke input hidden untuk validasi "required" form
+        quill.on('text-change', function() {
+            var html = quill.root.innerHTML;
+            if (html === '<p><br></p>') html = '';
+            document.getElementById('berita-konten').value = html;
+        });
+
+        // Handle Login Dummy
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            
+            if (user === 'admin' && pass === 'banser123') {
+                loginView.classList.add('hidden');
+                dashboardView.classList.remove('hidden');
+                fetchBeritaList(); // Ambil berita saat berhasil login
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        });
+
+        function logout() {
+            dashboardView.classList.add('hidden');
+            loginView.classList.remove('hidden');
+            document.getElementById('login-form').reset();
+            document.getElementById('login-error').classList.add('hidden');
+        }
+
+        // Handle Pergantian Halaman (Menu Sidebar)
+        function showSection(sectionId) {
+            // Sembunyikan semua section
+            document.getElementById('section-list-berita').classList.add('hidden');
+            document.getElementById('section-tambah-berita').classList.add('hidden');
+            document.getElementById('section-profil-admin').classList.add('hidden');
+            document.getElementById('section-konfigurasi-api').classList.add('hidden');
+            
+            // Tampilkan section yang dituju
+            document.getElementById('section-' + sectionId).classList.remove('hidden');
+            
+            // Perbarui warna link menu aktif
+            const links = document.querySelectorAll('.nav-link');
+            links.forEach(link => {
+                link.classList.remove('bg-gradient-to-r', 'from-ansor-50', 'text-ansor-700', 'border-ansor-600');
+                link.classList.add('text-gray-600', 'border-transparent');
+            });
+            event.currentTarget.classList.remove('text-gray-600', 'border-transparent');
+            event.currentTarget.classList.add('bg-gradient-to-r', 'from-ansor-50', 'text-ansor-700', 'border-ansor-600');
+
+            // Ganti Judul Topbar
+            const titles = {
+                'list-berita': 'Kelola Berita',
+                'tambah-berita': 'Tulis Berita Baru',
+                'profil-admin': 'Pengaturan Profil Admin',
+                'konfigurasi-api': 'Konfigurasi Sistem'
+            };
+            document.getElementById('page-title').innerText = titles[sectionId];
+            
+            // Fetch data jika buka list berita
+            if(sectionId === 'list-berita') {
+                fetchBeritaList();
+            }
+        }
+
+        // Preview Image Upload
+        let base64ImageString = ""; 
+        
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Batasi max 5MB (5 * 1024 * 1024 bytes)
+                if(file.size > 5242880){
+                    showToast("Ukuran foto maksimal 5MB!", true);
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('image-preview').src = e.target.result;
+                    document.getElementById('image-preview-container').classList.remove('hidden');
+                    base64ImageString = e.target.result.split(',')[1];
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeImage() {
+            document.getElementById('berita-foto').value = '';
+            document.getElementById('image-preview').src = '';
+            document.getElementById('image-preview-container').classList.add('hidden');
+            base64ImageString = "";
+        }
+
+        // Tampilkan Notifikasi
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = message;
+            document.getElementById('toast-icon').innerText = isError ? 'error' : 'check_circle';
+            document.getElementById('toast-icon').className = isError ? 'material-icons-round text-red-400' : 'material-icons-round text-green-400';
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // --- SUBMIT FORM BERITA (POST) ---
+        document.getElementById('form-berita').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btnSubmit = document.getElementById('btn-submit');
+            
+            if(!SCRIPT_URL) {
+                showToast("Peringatan: URL API Google belum dikonfigurasi!", true);
+                return;
+            }
+
+            // Pastikan editor tidak kosong
+            if(!document.getElementById('berita-konten').value) {
+                showToast("Isi berita tidak boleh kosong!", true);
+                return;
+            }
+
+            const payload = {
+                judul: document.getElementById('berita-judul').value,
+                kategori: document.getElementById('berita-kategori').value,
+                tanggal: document.getElementById('berita-tanggal').value,
+                konten: quill.root.innerHTML, // Mengambil format HTML dari Quill
+                fotoBase64: base64ImageString,
+                namaFile: document.getElementById('berita-foto').files[0]?.name || ""
+            };
+            
+            const originalBtnHtml = btnSubmit.innerHTML;
+            btnSubmit.innerHTML = `<span class="material-icons-round animate-spin mr-2 text-[18px]">autorenew</span> Memproses...`;
+            btnSubmit.disabled = true;
+
+            try {
+                // Mengirim request ke Google Script API
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showToast("Berita dan foto berhasil disimpan ke Spreadsheet & Drive!");
+                    document.getElementById('form-berita').reset();
+                    quill.setContents([]); // Bersihkan editor Quill
+                    document.getElementById('berita-konten').value = ''; // Reset hidden input
+                    removeImage();
+                    
+                    // Kembali ke list & refresh data
+                    setTimeout(() => {
+                        const links = document.querySelectorAll('.nav-link');
+                        links[0].click(); // Klik tab list berita
+                    }, 1500);
+                } else {
+                    showToast("Error: " + result.message, true);
+                }
+            } catch (error) {
+                showToast("Gagal menyambung ke server Google Script", true);
+                console.error(error);
+            } finally {
+                btnSubmit.innerHTML = originalBtnHtml;
+                btnSubmit.disabled = false;
+            }
+        });
+
+        // --- AMBIL DAFTAR BERITA (GET) ---
+        async function fetchBeritaList() {
+            if(!SCRIPT_URL) return;
+
+            const tableBody = document.getElementById('table-body');
+            const tableInfo = document.getElementById('table-info');
+            tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-500"><span class="material-icons-round animate-spin text-2xl mb-2">autorenew</span><br>Memuat data...</td></tr>`;
+            tableInfo.innerText = "Menampilkan data...";
+
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    if(result.data.length === 0) {
+                        tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-500">Belum ada berita yang dipublikasikan.</td></tr>`;
+                        tableInfo.innerText = "0 berita";
+                        return;
+                    }
+
+                    tableBody.innerHTML = ''; // Bersihkan tabel
+                    tableInfo.innerText = `Menampilkan ${result.data.length} berita terbaru`;
+                    
+                    // Render tiap baris data
+                    result.data.forEach(berita => {
+                        const fallbackImg = "https://placehold.co/100x100/e5e7eb/6b7280?text=No+Img";
+                        const imgSource = berita.imageUrl ? berita.imageUrl : fallbackImg;
+                        const kategoriColor = berita.kategori === 'Banser' ? 'from-blue-50 to-blue-100 text-blue-800 border-blue-200/50' : 'from-ansor-50 to-green-100 text-ansor-800 border-green-200/50';
+
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-ansor-50/50 transition-colors group';
+                        tr.innerHTML = `
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden border border-gray-200">
+                                        <img src="${imgSource}" class="w-full h-full object-cover" onerror="this.src='${fallbackImg}'">
+                                    </div>
+                                    <p class="font-bold text-gray-900 group-hover:text-ansor-700 transition-colors truncate max-w-[250px]">${berita.judul}</p>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4"><span class="px-3 py-1 bg-gradient-to-r ${kategoriColor} rounded-md text-xs font-bold border">${berita.kategori}</span></td>
+                            <td class="px-6 py-4 text-gray-500 font-medium">${berita.tanggal}</td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Publik
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <button class="text-blue-600 hover:text-blue-800 p-1.5 rounded-md hover:bg-blue-50 transition-colors" title="Fitur Edit (Segera)"><span class="material-icons-round text-[20px]">edit</span></button>
+                            </td>
+                        `;
+                        tableBody.appendChild(tr);
+                    });
+                }
+            } catch (error) {
+                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-red-500">Gagal memuat berita dari server API. Pastikan URL API benar.</td></tr>`;
+                tableInfo.innerText = "Error mengambil data";
+            }
+        }
+
+        // --- SUBMIT FORM PROFIL ADMIN (DUMMY) ---
+        document.getElementById('form-profil').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const inputs = this.querySelectorAll('input[type="password"]');
+            
+            if(inputs[0].value !== inputs[1].value) {
+                showToast("Konfirmasi password tidak cocok!", true);
+                return;
+            }
+            if(inputs[0].value.length < 6) {
+                showToast("Password minimal 6 karakter!", true);
+                return;
+            }
+
+            // Simulasi sukses
+            showToast("Profil admin berhasil diperbarui!");
+            this.reset();
+        });
+
+        // --- SUBMIT & TEST KONFIGURASI API ---
+        document.getElementById('form-api').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newUrl = document.getElementById('api-url-input').value.trim();
+            
+            if(!newUrl.startsWith('https://script.google.com/')) {
+                showToast("Format URL Google Script tidak valid!", true);
+                return;
+            }
+
+            // Simpan ke Local Storage & Variable Global
+            localStorage.setItem('ansor_api_url', newUrl);
+            SCRIPT_URL = newUrl;
+            
+            showToast("URL API berhasil disimpan di perangkat ini!");
+        });
+
+        async function testConnection() {
+            const testUrl = document.getElementById('api-url-input').value.trim();
+            if(!testUrl) {
+                showToast("URL tidak boleh kosong!", true);
+                return;
+            }
+
+            showToast("Menguji koneksi ke server...");
+            try {
+                const response = await fetch(testUrl);
+                const result = await response.json();
+                
+                if (result.status === 'success' || result.data) {
+                    setTimeout(() => showToast("Koneksi berhasil terhubung!"), 1000);
+                } else {
+                    setTimeout(() => showToast("Terhubung, tapi ada error dari Google Script.", true), 1000);
+                }
+            } catch (error) {
+                setTimeout(() => showToast("Gagal terhubung ke API!", true), 1000);
+            }
+        }
+    </script>
+</body>
+</html>
