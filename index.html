@@ -16,7 +16,7 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Tailwind Plugin Typography (Untuk merender output HTML dari Editor) -->
+    <!-- Tailwind Plugin Typography (Untuk merender output HTML dari Editor jika diperlukan di cuplikan) -->
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     
     <!-- Tailwind Configuration -->
@@ -68,12 +68,13 @@
             border: 1px solid #e5e7eb;
             border-radius: 0.75rem;
             transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+            will-change: transform, box-shadow; /* Optimasi GPU */
         }
         
         .card-minimal:hover {
             border-color: #16a34a;
             box-shadow: 0 10px 20px -5px rgba(21, 128, 61, 0.08), 0 4px 6px -2px rgba(21, 128, 61, 0.04);
-            transform: translateY(-4px) !important;
+            transform: translateY(-4px);
         }
 
         /* Tombol Formal & Bersih dengan Gradasi */
@@ -92,6 +93,7 @@
             background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
             color: white;
             border: 1px solid transparent;
+            will-change: transform;
         }
         
         .btn-primary:hover {
@@ -107,6 +109,7 @@
             position: relative;
             overflow: hidden;
             z-index: 1;
+            will-change: transform;
         }
 
         .btn-outline::before {
@@ -143,15 +146,17 @@
             background-size: 24px 24px;
         }
 
+        /* OPTIMASI: Menggunakan translate3d untuk memaksa Hardware Acceleration (GPU) */
         @keyframes blob {
-            0% { transform: translate(0px, 0px) scale(1); }
-            33% { transform: translate(30px, -50px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
-            100% { transform: translate(0px, 0px) scale(1); }
+            0% { transform: translate3d(0px, 0px, 0) scale(1); }
+            33% { transform: translate3d(30px, -50px, 0) scale(1.1); }
+            66% { transform: translate3d(-20px, 20px, 0) scale(0.9); }
+            100% { transform: translate3d(0px, 0px, 0) scale(1); }
         }
 
         .animate-blob {
             animation: blob 12s infinite alternate ease-in-out;
+            will-change: transform; /* Hint ke browser untuk dialokasikan di layer GPU */
         }
 
         .animation-delay-2000 {
@@ -161,16 +166,19 @@
             animation-delay: 4s;
         }
 
-        /* ANIMASI SCROLL (ENTRANCE) */
+        /* ANIMASI SCROLL (ENTRANCE) OPTIMASI */
         .reveal {
             opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 0.8s cubic-bezier(0.5, 0, 0, 1), transform 0.8s cubic-bezier(0.5, 0, 0, 1);
+            /* Dikurangi dari 40px ke 30px agar terasa lebih ringan */
+            transform: translate3d(0, 30px, 0); 
+            /* Dipercepat dari 0.8s menjadi 0.6s dan ease-out agar responsif */
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            will-change: opacity, transform; /* Hardware acceleration */
         }
 
         .reveal.active {
             opacity: 1;
-            transform: translateY(0);
+            transform: translate3d(0, 0, 0);
         }
 
         /* Delay stagger untuk elemen grid (agar muncul bergantian) */
@@ -187,13 +195,13 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <!-- Logo -->
-                <div class="flex-shrink-0 flex items-center gap-3">
+                <a href="index.html" class="flex-shrink-0 flex items-center gap-3">
                     <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiWgdCezKkWjkWguibQEQBtve_mAsbV0jFzUTUfLBisylyysgLSLoSroMeGRqp4vSlk82sJcS283vA6kblih9iBejXTkzTgkZlKItS1R4RjnQyllx1Ij_3c2osBYFgti5ZfO4ODqVR2v7P8wPCYg15HeLKDeKIjf9KtXcdp7STlAogiQKH6WujbkoK1YZc/s320/1000157203.jpg" alt="Logo GP Ansor" class="h-11 w-auto object-contain drop-shadow-sm">
                     <div class="flex flex-col justify-center">
                         <span class="font-bold text-lg text-gray-900 leading-none mb-1">Gerakan Pemuda Ansor</span>
                         <span class="text-xs font-medium text-gray-500 leading-none">Ranting Sowan Kidul</span>
                     </div>
-                </div>
+                </a>
 
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex items-center space-x-8">
@@ -242,9 +250,9 @@
         <!-- Elemen Latar Belakang (Interactive & Decorative) -->
         <div class="absolute inset-0 bg-gradient-to-br from-ansor-50/60 via-white to-gray-50/50 z-0 pointer-events-none"></div>
         
-        <!-- Animated Blobs -->
-        <div class="absolute top-0 left-0 w-[500px] h-[500px] bg-ansor-100 rounded-full mix-blend-multiply filter blur-[80px] opacity-60 animate-blob z-0 -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
-        <div class="absolute top-20 right-0 w-[400px] h-[400px] bg-green-50 rounded-full mix-blend-multiply filter blur-[60px] opacity-70 animate-blob animation-delay-2000 z-0 translate-x-1/3 pointer-events-none"></div>
+        <!-- OPTIMASI: Menghapus mix-blend-multiply dan blur yang terlalu ekstrem agar tidak patah-patah -->
+        <div class="absolute top-0 left-0 w-[500px] h-[500px] bg-ansor-100 rounded-full filter blur-3xl opacity-50 animate-blob z-0 -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+        <div class="absolute top-20 right-0 w-[400px] h-[400px] bg-green-100 rounded-full filter blur-3xl opacity-50 animate-blob animation-delay-2000 z-0 translate-x-1/3 pointer-events-none"></div>
         
         <!-- Pola Titik -->
         <div class="absolute top-24 left-8 w-48 h-48 pattern-dots opacity-20 z-0 pointer-events-none"></div>
@@ -266,20 +274,20 @@
                     Gerakan Pemuda Ansor Ranting Sowan Kidul berdedikasi dalam menebarkan nilai Islam Ahlussunnah wal Jamaah yang moderat, melestarikan tradisi kiai, dan mengabdi untuk kemaslahatan masyarakat desa.
                 </p>
                 <div class="flex flex-wrap gap-3 pt-4">
-                    <button class="btn-clean btn-primary">
+                    <a href="#profil" class="btn-clean btn-primary">
                         Tentang Kami
-                    </button>
-                    <button class="btn-clean btn-outline bg-white/50 backdrop-blur">
+                    </a>
+                    <a href="#berita" class="btn-clean btn-outline bg-white/50 backdrop-blur">
                         <span class="material-icons-round text-sm mr-2">feed</span>
                         Berita Terkini
-                    </button>
+                    </a>
                 </div>
             </div>
             
             <!-- Gambar Hero Minimalis dengan Aksen -->
             <div class="w-full md:w-1/2 relative reveal delay-200">
                 <!-- Floating Badge bergaya gradasi -->
-                <div class="absolute -left-6 top-10 bg-white p-3 pr-5 rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-50 flex items-center gap-4 z-20 animate-bounce" style="animation-duration: 3s;">
+                <div class="absolute -left-6 top-10 bg-white p-3 pr-5 rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-50 flex items-center gap-4 z-20 animate-bounce" style="animation-duration: 3s; will-change: transform;">
                     <div class="w-12 h-12 bg-gradient-to-br from-ansor-600 to-ansor-800 text-white rounded-xl flex items-center justify-center shadow-inner">
                         <span class="material-icons-round">groups</span>
                     </div>
@@ -378,67 +386,76 @@
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
                 <!-- Berita Utama -->
                 <div class="md:col-span-7 lg:col-span-8 reveal delay-100">
-                    <article class="group cursor-pointer">
-                        <div class="block overflow-hidden rounded-2xl border border-gray-200 mb-5 relative shadow-sm group-hover:shadow-md transition-shadow">
-                            <img src="https://placehold.co/800x450/e5e7eb/6b7280?text=Highlight+Berita+Utama" alt="Berita Utama" class="w-full h-auto object-cover transform group-hover:scale-[1.02] transition-transform duration-500">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        </div>
-                        <div class="flex items-center gap-4 text-xs text-gray-500 mb-3">
-                            <span class="inline-block px-2.5 py-1 bg-gradient-to-r from-ansor-50 to-green-100 text-ansor-800 font-semibold rounded-md uppercase border border-green-200/50">Ranting</span>
-                            <span>•</span>
-                            <span class="flex items-center"><span class="material-icons-round text-[14px] mr-1">calendar_today</span> 12 Mei 2026</span>
-                        </div>
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2 group-hover:text-ansor-700 transition-colors">
-                            <a href="#">Rutin Majelis Dzikir dan Sholawat Rijalul Ansor Ranting Sowan Kidul</a>
-                        </h3>
-                        <p class="text-gray-600 text-base leading-relaxed">
-                            Puluhan pemuda desa kembali berkumpul dalam majelis rutin Rijalul Ansor yang diselenggarakan di Mushola Al-Huda Sowan Kidul. Agenda ini bertujuan untuk memperkuat amaliyah aswaja...
-                        </p>
-                    </article>
+                    <!-- Tautan ke halaman berita dipindahkan ke tag <a href> yang membungkus keseluruhan artikel -->
+                    <a href="berita.html?id=dummy1" class="group cursor-pointer block">
+                        <article>
+                            <div class="block overflow-hidden rounded-2xl border border-gray-200 mb-5 relative shadow-sm group-hover:shadow-md transition-shadow">
+                                <img src="https://placehold.co/800x450/e5e7eb/6b7280?text=Highlight+Berita+Utama" alt="Berita Utama" class="w-full h-auto object-cover transform group-hover:scale-[1.02] transition-transform duration-500">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            </div>
+                            <div class="flex items-center gap-4 text-xs text-gray-500 mb-3">
+                                <span class="inline-block px-2.5 py-1 bg-gradient-to-r from-ansor-50 to-green-100 text-ansor-800 font-semibold rounded-md uppercase border border-green-200/50">Ranting</span>
+                                <span>•</span>
+                                <span class="flex items-center"><span class="material-icons-round text-[14px] mr-1">calendar_today</span> 12 Mei 2026</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2 group-hover:text-ansor-700 transition-colors">
+                                Rutin Majelis Dzikir dan Sholawat Rijalul Ansor Ranting Sowan Kidul
+                            </h3>
+                            <p class="text-gray-600 text-base leading-relaxed line-clamp-3">
+                                Puluhan pemuda desa kembali berkumpul dalam majelis rutin Rijalul Ansor yang diselenggarakan di Mushola Al-Huda Sowan Kidul. Agenda ini bertujuan untuk memperkuat amaliyah aswaja...
+                            </p>
+                        </article>
+                    </a>
                 </div>
 
                 <!-- Daftar Berita Lainnya -->
                 <div class="md:col-span-5 lg:col-span-4 flex flex-col gap-6">
                     
-                    <article class="flex gap-4 group cursor-pointer reveal delay-200">
-                        <div class="flex-shrink-0 w-28 h-24 rounded-xl overflow-hidden border border-gray-200 shadow-sm relative">
-                            <img src="https://placehold.co/150x150/e5e7eb/6b7280?text=Berita+2" alt="Thumb" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        </div>
-                        <div class="flex flex-col justify-center">
-                            <span class="text-xs text-gray-400 mb-1">10 Mei 2026</span>
-                            <h4 class="text-sm font-bold text-gray-900 group-hover:text-ansor-700 leading-snug line-clamp-2 transition-colors">
-                                <a href="#">Banser Sowan Kidul Kawal Ketat Pengamanan Pengajian Akbar Haul Mbah Mutamakkin</a>
-                            </h4>
-                        </div>
-                    </article>
+                    <a href="berita.html?id=dummy2" class="group cursor-pointer block reveal delay-200">
+                        <article class="flex gap-4">
+                            <div class="flex-shrink-0 w-28 h-24 rounded-xl overflow-hidden border border-gray-200 shadow-sm relative">
+                                <img src="https://placehold.co/150x150/e5e7eb/6b7280?text=Berita+2" alt="Thumb" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <span class="text-xs text-gray-400 mb-1">10 Mei 2026</span>
+                                <h4 class="text-sm font-bold text-gray-900 group-hover:text-ansor-700 leading-snug line-clamp-2 transition-colors">
+                                    Banser Sowan Kidul Kawal Ketat Pengamanan Pengajian Akbar Haul Mbah Mutamakkin
+                                </h4>
+                            </div>
+                        </article>
+                    </a>
 
                     <hr class="border-gray-100 reveal delay-200">
 
-                    <article class="flex gap-4 group cursor-pointer reveal delay-300">
-                        <div class="flex-shrink-0 w-28 h-24 rounded-xl overflow-hidden border border-gray-200 shadow-sm relative">
-                            <img src="https://placehold.co/150x150/e5e7eb/6b7280?text=Berita+3" alt="Thumb" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        </div>
-                        <div class="flex flex-col justify-center">
-                            <span class="text-xs text-gray-400 mb-1">8 Mei 2026</span>
-                            <h4 class="text-sm font-bold text-gray-900 group-hover:text-ansor-700 leading-snug line-clamp-2 transition-colors">
-                                <a href="#">Bakti Sosial Bersih-Bersih Makam Desa Jelang Ramadhan Bersama Pemdes</a>
-                            </h4>
-                        </div>
-                    </article>
+                    <a href="berita.html?id=dummy3" class="group cursor-pointer block reveal delay-300">
+                        <article class="flex gap-4">
+                            <div class="flex-shrink-0 w-28 h-24 rounded-xl overflow-hidden border border-gray-200 shadow-sm relative">
+                                <img src="https://placehold.co/150x150/e5e7eb/6b7280?text=Berita+3" alt="Thumb" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <span class="text-xs text-gray-400 mb-1">8 Mei 2026</span>
+                                <h4 class="text-sm font-bold text-gray-900 group-hover:text-ansor-700 leading-snug line-clamp-2 transition-colors">
+                                    Bakti Sosial Bersih-Bersih Makam Desa Jelang Ramadhan Bersama Pemdes
+                                </h4>
+                            </div>
+                        </article>
+                    </a>
                     
                     <hr class="border-gray-100 reveal delay-300">
 
-                    <article class="flex gap-4 group cursor-pointer reveal delay-400">
-                        <div class="flex-shrink-0 w-28 h-24 rounded-xl overflow-hidden border border-gray-200 shadow-sm relative">
-                            <img src="https://placehold.co/150x150/e5e7eb/6b7280?text=Berita+4" alt="Thumb" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        </div>
-                        <div class="flex flex-col justify-center">
-                            <span class="text-xs text-gray-400 mb-1">5 Mei 2026</span>
-                            <h4 class="text-sm font-bold text-gray-900 group-hover:text-ansor-700 leading-snug line-clamp-2 transition-colors">
-                                <a href="#">Kaderisasi Tingkat Dasar (PKD) Diikuti Puluhan Pemuda Sowan Kidul</a>
-                            </h4>
-                        </div>
-                    </article>
+                    <a href="berita.html?id=dummy4" class="group cursor-pointer block reveal delay-400">
+                        <article class="flex gap-4">
+                            <div class="flex-shrink-0 w-28 h-24 rounded-xl overflow-hidden border border-gray-200 shadow-sm relative">
+                                <img src="https://placehold.co/150x150/e5e7eb/6b7280?text=Berita+4" alt="Thumb" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <span class="text-xs text-gray-400 mb-1">5 Mei 2026</span>
+                                <h4 class="text-sm font-bold text-gray-900 group-hover:text-ansor-700 leading-snug line-clamp-2 transition-colors">
+                                    Kaderisasi Tingkat Dasar (PKD) Diikuti Puluhan Pemuda Sowan Kidul
+                                </h4>
+                            </div>
+                        </article>
+                    </a>
 
                 </div>
             </div>
@@ -649,24 +666,25 @@
                     const katColorUtama = beritaUtama.kategori === 'Banser' ? 'from-blue-50 to-blue-100 text-blue-800 border-blue-200/50' : 'from-ansor-50 to-green-100 text-ansor-800 border-green-200/50';
 
                     containerUtama.innerHTML = `
-                        <article class="group cursor-pointer">
-                            <div class="block overflow-hidden rounded-2xl border border-gray-200 mb-5 relative shadow-sm group-hover:shadow-md transition-shadow">
-                                <img src="${imgUtama}" alt="Berita Utama" onerror="this.src='${fallbackImg}'" class="w-full h-64 md:h-80 object-cover transform group-hover:scale-[1.02] transition-transform duration-500">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            </div>
-                            <div class="flex items-center gap-4 text-xs text-gray-500 mb-3">
-                                <span class="inline-block px-2.5 py-1 bg-gradient-to-r ${katColorUtama} font-semibold rounded-md uppercase border">${beritaUtama.kategori}</span>
-                                <span>•</span>
-                                <span class="flex items-center"><span class="material-icons-round text-[14px] mr-1">calendar_today</span> ${beritaUtama.tanggal}</span>
-                            </div>
-                            <h3 class="text-2xl font-bold text-gray-900 mb-2 group-hover:text-ansor-700 transition-colors">
-                                <a href="#">${beritaUtama.judul}</a>
-                            </h3>
-                            <!-- Prose text untuk merender format tulisan dari WYSIWYG secara otomatis -->
-                            <div class="text-gray-600 text-base leading-relaxed line-clamp-3 prose prose-sm prose-green max-w-none">
-                                ${beritaUtama.konten}
-                            </div>
-                        </article>
+                        <a href="berita.html?id=${beritaUtama.id}" class="group cursor-pointer block">
+                            <article>
+                                <div class="block overflow-hidden rounded-2xl border border-gray-200 mb-5 relative shadow-sm group-hover:shadow-md transition-shadow">
+                                    <img src="${imgUtama}" alt="Berita Utama" onerror="this.src='${fallbackImg}'" class="w-full h-64 md:h-80 object-cover transform group-hover:scale-[1.02] transition-transform duration-500">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                </div>
+                                <div class="flex items-center gap-4 text-xs text-gray-500 mb-3">
+                                    <span class="inline-block px-2.5 py-1 bg-gradient-to-r ${katColorUtama} font-semibold rounded-md uppercase border">${beritaUtama.kategori}</span>
+                                    <span>•</span>
+                                    <span class="flex items-center"><span class="material-icons-round text-[14px] mr-1">calendar_today</span> ${beritaUtama.tanggal}</span>
+                                </div>
+                                <h3 class="text-2xl font-bold text-gray-900 mb-2 group-hover:text-ansor-700 transition-colors">
+                                    ${beritaUtama.judul}
+                                </h3>
+                                <div class="text-gray-600 text-base leading-relaxed line-clamp-3 prose prose-sm prose-green max-w-none">
+                                    ${beritaUtama.konten}
+                                </div>
+                            </article>
+                        </a>
                     `;
 
                     // Render List Berita (Kanan)
@@ -682,17 +700,19 @@
                             }
 
                             containerListKanan.insertAdjacentHTML('beforeend', `
-                                <article class="flex gap-4 group cursor-pointer fade-in">
-                                    <div class="flex-shrink-0 w-28 h-24 rounded-xl overflow-hidden border border-gray-200 shadow-sm relative bg-gray-100">
-                                        <img src="${imgList}" alt="Thumb" onerror="this.src='${fallbackImg}'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                                    </div>
-                                    <div class="flex flex-col justify-center">
-                                        <span class="text-xs text-gray-400 mb-1 font-medium">${berita.tanggal}</span>
-                                        <h4 class="text-sm font-bold text-gray-900 group-hover:text-ansor-700 leading-snug line-clamp-2 transition-colors">
-                                            <a href="#">${berita.judul}</a>
-                                        </h4>
-                                    </div>
-                                </article>
+                                <a href="berita.html?id=${berita.id}" class="group cursor-pointer block fade-in">
+                                    <article class="flex gap-4">
+                                        <div class="flex-shrink-0 w-28 h-24 rounded-xl overflow-hidden border border-gray-200 shadow-sm relative bg-gray-100">
+                                            <img src="${imgList}" alt="Thumb" onerror="this.src='${fallbackImg}'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                        </div>
+                                        <div class="flex flex-col justify-center">
+                                            <span class="text-xs text-gray-400 mb-1 font-medium">${berita.tanggal}</span>
+                                            <h4 class="text-sm font-bold text-gray-900 group-hover:text-ansor-700 leading-snug line-clamp-2 transition-colors">
+                                                ${berita.judul}
+                                            </h4>
+                                        </div>
+                                    </article>
+                                </a>
                             `);
                         });
                     }
