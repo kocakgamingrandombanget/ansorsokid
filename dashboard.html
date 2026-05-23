@@ -944,15 +944,12 @@
                 const warna = getWarnaUntukKategori(berita.kategori);
                 const badgeClass = getWarnaBadge(warna);
 
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-ansor-50/50 transition-colors group';
-
                 const judulEsc = escHtml(berita.judul);
                 const kategoriEsc = escHtml(berita.kategori);
                 const tanggalEsc = escHtml(berita.tanggal);
-                const kontenB64 = encodeURIComponent(berita.konten || '');
-                const imgUrlB64 = encodeURIComponent(berita.imageUrl || '');
 
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-ansor-50/50 transition-colors group';
                 tr.innerHTML = `
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-4">
@@ -972,18 +969,18 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 text-right">
-                        <button onclick="handleEditBerita('${berita.id}', '${judulEsc}', '${kategoriEsc}', '${tanggalEsc}', decodeURIComponent('${kontenB64}'), decodeURIComponent('${imgUrlB64}'))"
-                            class="text-blue-600 hover:text-blue-800 p-1.5 rounded-md hover:bg-blue-50 transition-colors" title="Edit Berita">
+                        <button class="btn-edit-row text-blue-600 hover:text-blue-800 p-1.5 rounded-md hover:bg-blue-50 transition-colors" title="Edit Berita">
                             <span class="material-icons-round text-[20px]">edit</span>
                         </button>
                     </td>
                 `;
+
+                tr.querySelector('.btn-edit-row').addEventListener('click', function() {
+                    openEditForm(berita.id, berita.judul, berita.kategori, berita.tanggal, berita.konten, berita.imageUrl);
+                });
+
                 tableBody.appendChild(tr);
             });
-        }
-
-        function handleEditBerita(id, judul, kategori, tanggal, konten, imageUrl) {
-            openEditForm(id, judul, kategori, tanggal, konten, imageUrl);
         }
 
         function filterBerita() {
